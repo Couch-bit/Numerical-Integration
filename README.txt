@@ -46,6 +46,7 @@ Function Prerequisites:
 	- +
 	- *
 	- /
+	- ^
 - must be continuous on the interval of integration;
 - must have correct syntax:
 	- every operator follows and is followed by a number, constant, variable 
@@ -59,7 +60,7 @@ Function Prerequisites:
 Bound Prerequisites:
 - Same as function but can't have variables;
 
-Consequances For inputing incorrect information:
+Consequences For inputing incorrect information:
 - if the variable is incorrect asks for it to be inputed again;
 - if the syntax is incorrect asks for the expression to be inputed again;
 - if the upper bound is less or equal to the lower bound asks for it to be inputed again;
