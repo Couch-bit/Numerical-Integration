@@ -372,6 +372,8 @@ double evaluate_expression(char* function, double value, char variable) {
 
     // Removes the last number from the stack.
     stack_for_computing = pop_d(stack_for_computing, &temp);
+    // Frees memory reserved for current.
+    free(current);
     // Returns said number.
     return temp;
 }
