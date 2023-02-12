@@ -35,7 +35,7 @@ Function Prerequisites:
 	- arctanh;
 	- arccoth;
 	- sqrt;
-	- logNUMBER (NUMBER - any numerical value greater tha.
+	- logNUMBER (NUMBER - any numerical value, will fail to evaluate if it's non-positive or equal to 1.
 - can consist of numbers;
 - can consits of constants:
 	- e;
@@ -59,9 +59,11 @@ Function Prerequisites:
 
 Bound Prerequisites:
 - Same as function but can't have variables;
+- Upper bound can't be less or equal to the lower bound.
 
 Consequences For inputing incorrect information:
 - if the variable is incorrect asks for it to be inputed again;
 - if the syntax is incorrect asks for the expression to be inputed again;
+- if bounds are incorrect asks for them to be inputed again;
 - if the upper bound is less or equal to the lower bound asks for it to be inputed again;
-- if the function couldn't be evaluated at a point calculations end and a prompt is displayed. 
+- if the function couldn't be evaluated at a point calculations end and a prompt is displayed.
