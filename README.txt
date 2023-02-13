@@ -1,6 +1,6 @@
 Basic Info:
 It's written in Visual C, though the program can easily be made compatible 
-with C99 by changing scanf_s (sscanf_s) to scanf (sscanf).
+with C99 by changing sscanf_s to sscanf.
 The Program uses Boole's formula to approximate the value of a definite
 integral (by default for 1000 intervals, 
 though this can be changed by modifying the constant inside the code of the project)
@@ -11,7 +11,7 @@ at the end of the program.
 
 
 Variable Prerequisites:
-- must be a letter that's not 'e';
+- must be a letter that's not 'e'.
 
 Function Prerequisites:
 - can consist of elementary functions:
@@ -39,7 +39,7 @@ Function Prerequisites:
 - can consist of numbers;
 - can consits of constants:
 	- e;
-	- pi;
+	- pi.
 - can consist of variables;
 - can consist of operators:
 	- -

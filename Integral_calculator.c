@@ -6,20 +6,20 @@
 
 
 // Clears stdin.
-static void clear_stdin();
+inline static void clear_stdin();
 // Removes the newline from a string if there is one, otherwise 
 // clears stdin.
-static void remove_newline(char*);
+inline static void remove_newline(char*);
 
 
 int main(void) {
 
     char user_function[MAX_EXPRESSION_SIZE];
-    char a_string[MAX_EXPRESSION_SIZE];
-    char b_string[MAX_EXPRESSION_SIZE];
+    char buffer[MAX_EXPRESSION_SIZE];
+    char* bound_rpn = NULL;
     char* function_rpn = NULL;
-    char variable_char;
     char user_response = 'n';
+    char variable_char;
     double a, b, h, y0, y1, y2, y3, y4, current_argument;
     double result;
 
@@ -29,12 +29,14 @@ int main(void) {
         // Reads a character from user, only
         // accepting letters that aren't 'e',
         // repeats until getting the correct character.
-        while (!(scanf_s("%c", &variable_char, 1) == 1 &&
-            variable_char != 'e' && isalpha(variable_char))) {
+        while (!(fgets(buffer, MAX_EXPRESSION_SIZE, stdin) &&
+            (remove_newline(buffer), 
+                buffer[0] != 'e' && isalpha(buffer[0])))) {
             printf("Illegal variable, try again: ");
-            if (variable_char != '\n') clear_stdin();
+            
         }
-        clear_stdin();
+        variable_char = buffer[0];
+        
 
         puts("Input the function:");
         // Reads the function from user, repeats the process until 
@@ -56,28 +58,42 @@ int main(void) {
         // Reads the lower integration bound from user and
         // calculates it's numerical value, 
         // continues until the expression and the value are correct.
-        while (!(fgets(a_string, MAX_EXPRESSION_SIZE, stdin) &&
-            (remove_newline(a_string),
-                is_correct(a_string, '\0')) &&
+        while (!(fgets(buffer, MAX_EXPRESSION_SIZE, stdin) &&
+            (remove_newline(buffer),
+                is_correct(buffer, '\0')) &&
             !(isnan(a = evaluate_expression
-            (reverse_polish_notation(a_string), 0, '\0')) ||
+            (bound_rpn = reverse_polish_notation(buffer),
+                0, '\0')) ||
                 isinf(a)))) {
+            if (bound_rpn) {
+                free(bound_rpn);
+                bound_rpn = NULL;
+            }
             puts("Invalid bound, try again:");
         }
+        free(bound_rpn);
+        bound_rpn = NULL;
 
         puts("Input the upper integration bound:");
         // Reads the upper integration bound from user, repeats until
         // reading a correct expression that has a
         // correct numerical value that's
         // greater than the value of the lower integration bound.
-        while (!(fgets(b_string, MAX_EXPRESSION_SIZE, stdin) &&
-            (remove_newline(b_string),
-                is_correct(b_string, '\0')) &&
+        while (!(fgets(buffer, MAX_EXPRESSION_SIZE, stdin) &&
+            (remove_newline(buffer),
+                is_correct(buffer, '\0')) &&
             (b = evaluate_expression
-            (reverse_polish_notation(b_string), 0, '\0'),
+            (bound_rpn = reverse_polish_notation(buffer),
+                0, '\0'),
                 !(isnan(b) || isinf(b))) && b > a)) {
+            if (bound_rpn) {
+                free(bound_rpn);
+                bound_rpn = NULL;
+            }
             puts("Invalid bound, try again:");
         }
+        free(bound_rpn);
+        bound_rpn = NULL;
 
         // Defines the distance between arguments.
         h = (b - a) / (NUMBER_OF_INTERVALS * 4);
@@ -118,8 +134,8 @@ int main(void) {
                 (7 * y0 + 32 * y1 + 12 * y2 + 32 * y3 + 7 * y4);
 
             if (isnan(result) || isinf(result)) {
-                puts("Failed to evaluate integral, make sure the"
-                    "function is defined for the entire interval"
+                puts("Failed to evaluate integral, make sure the "
+                    "function is defined for the entire interval "
                     "as well as its edges");
                 break;
             }
@@ -133,20 +149,20 @@ int main(void) {
 
         printf("Continue calculating integrals? (y/n): ");
 
-        while (!(scanf_s("%c", &user_response, 1) == 1 &&
-            (user_response == 'y' || user_response == 'n'))) {
+        while (!(fgets(buffer, MAX_EXPRESSION_SIZE, stdin) &&
+            (remove_newline(buffer),
+               buffer[0] == 'y' || buffer[0] == 'n'))) {
             printf("Illegal response, try again: ");
-            if (user_response != '\n') clear_stdin();
         }
+        user_response = buffer[0];
 
-        clear_stdin();
     } while (user_response == 'y');
 
     return 0;
 }
 
 
-static void clear_stdin() {
+inline static void clear_stdin() {
 
     static int temp = '\n';
 
@@ -154,12 +170,12 @@ static void clear_stdin() {
 }
 
 
-static void remove_newline(char* string) {
+inline static void remove_newline(char* string) {
 
     char* temp = &string[strlen(string) - 1];
 
     if (*temp == '\n') {
         *temp = '\0';
     }
-    else clear_stdin();
+    else if (!feof(stdin)) clear_stdin();
 }

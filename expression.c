@@ -51,6 +51,7 @@ static stack_c* pop_c(stack_c*, char*);
 
 bool is_correct(char* function, char variable) {
 
+
     if (*function == '\0') {
         return false;
     }
@@ -133,9 +134,6 @@ bool is_correct(char* function, char variable) {
         }
         current[current_index] = '\0';
 
-        // Skips trailing spaces.
-        while (*function == ' ') ++function;
-
         // Changes the subtraction sign to tilde if
         // it's meant as a negative of a number. 
         if (!previous && current[0] == '-') {
@@ -148,12 +146,13 @@ bool is_correct(char* function, char variable) {
 
             previous = number;
 
-            if (strlen(current) == 1 && current[0] == variable)
-                continue;
-            if (!strcmp(current, "e")) continue;
-            if (!strcmp(current, "pi")) continue;
-            if (is_number(current)) continue;
-            if (!is_function_correct(current, variable)) return false;
+            if (strlen(current) == 1 && current[0] == variable) {}
+            else if (!strcmp(current, "e")) {}
+            else if (!strcmp(current, "pi")) {}
+            else if (is_number(current)) {}
+            else if (!is_function_correct(current, variable)) {
+                return false;
+            }
         }
         else if (current[0] != '(' && current[0] != ')') {
 
@@ -197,6 +196,9 @@ bool is_correct(char* function, char variable) {
             function += temp_index;
         }
         else return false;
+
+        // Skips trailing spaces.
+        while (*function == ' ') ++function;
     }
 
     free(current);
@@ -209,6 +211,9 @@ bool is_correct(char* function, char variable) {
 double evaluate_expression(char* function, double value,
     char variable) {
 
+    if (!function) {
+        return NAN;
+    }
 
     stack_d* stack_for_computing = NULL;
     char* current = NULL;
@@ -224,7 +229,6 @@ double evaluate_expression(char* function, double value,
     uint_fast16_t parantheses_count = 0;
     uint_fast16_t index;
     double number;
-
 
     while (*function != '\0') {
 
@@ -322,6 +326,7 @@ double evaluate_expression(char* function, double value,
     stack_for_computing = pop_d(stack_for_computing, &temp);
 
     free(current);
+
     return temp;
 }
 
@@ -408,6 +413,13 @@ char* reverse_polish_notation(char* function) {
                         current[current_index] = '\0';
                         current = function_rpn(current,
                             &current_memory, &current_index);
+                        if (!current) {
+                            free(result);
+                            while (stack_for_transformation =
+                                pop_c(stack_for_transformation,
+                                    &temp)) {}
+                            return NULL;
+                        }
                     }
                 }
 
@@ -417,11 +429,6 @@ char* reverse_polish_notation(char* function) {
         }
 
         current[current_index] = '\0';
-
-        // Removes trailing spaces.
-        while (*function == ' ') {
-            ++function;
-        }
 
         // Changes the subtraction sign to tilde 
         // if it's meant as a negative of a number. 
@@ -555,6 +562,9 @@ char* reverse_polish_notation(char* function) {
             stack_for_transformation =
                 pop_c(stack_for_transformation, &temp);
         }
+
+        // Skips trailing spaces.
+        while (*function == ' ') ++function;
     }
 
     // Removes all remaining operators from the
@@ -565,6 +575,7 @@ char* reverse_polish_notation(char* function) {
 
         // Allocates extra memory if necessary.
         if (index + 2 > length_of_function) {
+            
             length_of_function = index + 2;
             temp_pointer = (char*)
                 realloc(result, length_of_function);
@@ -614,21 +625,22 @@ static bool is_number(char* string) {
 
 static bool is_function_correct(char* expression, char variable_char) {
 
-    // Store information on the location
-    // of the first character after the first opening parantheses.
+    char* temp = NULL;
     uint_fast16_t index = 0;
 
     // Finds the first opening parantheses in the expression.
     while (expression[index] != '(' && expression[index] != '\0') 
         ++index;
 
+    temp = &expression[strlen(expression) - 1];
+
     // Returns false if the there was
     // no opening parantheses in the string.
     if (expression[index] == '\0') return false;
-    if (expression[strlen(expression) - 1] != ')') return false;
+    if (*temp != ')') return false;
 
     // Sets the final parantheses in the string to the null terminator.
-    expression[strlen(expression) - 1] = '\0';
+    *temp = '\0';
     // Sets the opening parantheses to the null terminator.
     expression[index] = '\0';
     // Sets the index to be the index of the first character
@@ -890,15 +902,19 @@ static char* function_rpn(char* string, uint_fast16_t* max_length,
 
     // Makes a reverse polish notation of the inside function.
     temp_notation = reverse_polish_notation(&string[*index]);
+    if (!temp_notation) {
+        free(string);
+        return NULL;
+    }
 
     // Adds the reverse polish notation of the inside to the string.
     while (temp_notation[temp_index] != '\0') {
 
         // Allocates extra memory if necessary.
-        if (*index + 2 > *max_length) {
-            *max_length = *index + 2;
+        if (*index + 3 > *max_length) {
+            *max_length = *index + 3;
             temp_pointer = (char*)
-                realloc(string, *max_length);
+                realloc(string, (size_t)*max_length);
             if (!temp_pointer) {
                 free(string);
                 return NULL;
