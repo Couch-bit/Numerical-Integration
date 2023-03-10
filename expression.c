@@ -432,7 +432,7 @@ char* reverse_polish_notation(char* function) {
 
         // Changes the subtraction sign to tilde 
         // if it's meant as a negative of a number. 
-        if (((strlen(function) == (size_t)length_of_function - 1) ||
+        if (((strlen(function) == (size_t)length_of_function - 2) ||
             (*(function - 2) == '(')) && current[0] == '-') 
             current[0] = '~';
 
